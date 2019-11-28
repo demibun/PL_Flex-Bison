@@ -1,92 +1,58 @@
+%option noyywrap
+
 %{
-    /*
-        Define: 리터럴 블록, 정의, 내부 테이블 선언, 시작조건, 변환 등 포함 가능.
-        공백으로 시작하는 행은 C파일에 복사될 때 공백이 제거됨.
-    */    
+  
+    #include <stdio.h>
+    #include "parser.tab.h"
+
 %}
 
-/* lex Define */
-
+Integer [0-9]+
+ID [a-zA-Z](([a-zA-Z])|([0-9]))*
+Float [-+]?[0-9]*\.[0-9]+
+/* WHITESPACE 부분 추가 요망 */
 
 %%
 
+{Integer} {return Integer;}
+{ID} {return ID;}
+{Float} {return Float;}
+
+"mainprog" {return k_mainprog;}
+"function"  {return k_function;}
+"procedure" {return k_procedeure;}
+"begin" {return k_begin;}
+"end" {return k_end;}
+"if" {return k_if;}
+"then" {return k_then;}
+"else" {return k_else;}
+"elif" {return k_elif;}
+"nop" {return k_nop;}
+"while" {return k_while;}
+"return" {return k_return;}
+"print" {return k_print;}
+"in" {return k_in;}
+
+"+" {return o_plus;}
+"-" {return o_minus;}
+"*" {return o_mul;}
+"/" {return o_div;}
+"<" {return o_small;}
+"<=" {return o_small_equal;}
+">=" {return o_bigger_equal;}
+">" {return o_bigger;}
+"==" {return o_equal;}
+"!=" {return o_not_equal;}
+"!" {return o_not;}
+
+";" {return d_semicolon;}
+"." {return d_dot;}
+"," {return d_rest;}
+"=" {return d_substitute;}
+"(" {return d_open_bracket;}
+")" {return d_close_bracket;}
+"[" {return d_open_square_bracket;}
+"]" {return d_close_square_bracket;}
+":" {return d_colon;}
+
 %%
-
-/* 
-Rules: C코드는 생성된 C파일에 그대로 복사됨. Rules의 처음 부분에 존재하는 행들은
-생성되는 yacc() 함수의 처음 부분에 놓이며, 반드시 패턴과 관련된 코드 및 스캐너에 대한 
-초기화 코드에서 사용되는 변수들의 선언을 담고 있어야 함.
-다른 부분에 있는 C코드는 생성되는 C파일에 임이의 위치로 복사되며 주석만을 담아야 함.
-패턴행은 패턴을 담고 있으며, 각 패턴 뒤에는 약간의 공백과 패턴이 매치했을 때 실행될 C코드가 존재.
-만약 C 코드가 한 문장 이상이어서 여러 행으로 이루어진다면 반드시 {} 안에 담아야 함.
-
-ex)
-    rules1 c코드1 * 반드시 rule과 c코드 사이에 공백이 있어야 함.
-    rules2 c코드2
-    .
-    .
-    .
-    rulesn c코드n 
-        
-        ex)
-         [\t]+ ; : 공백([\t])이 1개 이상 들어오면 아무것도 하지 않음(;)
-
-*/
-
-/* 
-    User Subroutine: lex를 통해 C 파일에 그대로 복사됨. 
-                     파일이 큰 경우 별도의 파일에 정의하는 것이 바람직.
-                     main()을 정의하지 않으면 다른파일(bison 등)에서 정의한 main()을 수행.
-                     
-    
-    * Lex의 정규 표현식
-
-            문자         /                                          의미
-        A-Z, 0-9, a-z    / 패턴의 일부를 구성하는 문자와 숫자. 
-        .                / \n을 제외한 어느 문자와도 일치. 
-        -                / 범위를 표시할 때 사용. 예: A-Z은 문자 A부터 Z까지를 의미. 
-        [ ]              / 괄호 안의 어느 문자와도 일치. 첫 문자가 ^이면 부정 패턴을 나타냄. 예: [abC]는 a,b 혹은 C와 일치. 
-        *                / 선행 패턴의 발생이 0 이상. 
-        +                / 선행 패턴의 발생이 1 이상. 
-        ?                / 선행 패턴의 발생이 0 또는 1 일 때 일치. 
-        $                / 패턴의 마지막 문자가 행 종료일 때 일치. 
-        { }              / 패턴이 나타날 수 있는 횟수를 표시. 예: A{1,3}은 A가 1회나 3회 표시 가능을 의미. 
-        \                / 메타 문자를 피하기 위해 사용. 또한 이 표에 규정된 문자의 특별한 의미를 제거하는데 사용. 
-        ^                / 부정. 
-        |                / 수식의 논리합. 
-        "<some symbols>" / 문자 그대로의 의미. 메타 문자 보류. 
-        /                / 표현이 계속되는 경우에 한하여 선행 패턴과 일치. 예: A0/1은 A01이 입력일 경우에 한하여 A0와 일치. 
-        ( )              / 일련의 정규식을 그룹화.
-
-   
-    * 토큰 선언 예제
-
-        토큰      / 관련 수식                           / 의미
-        number    / ([0-9])+                           / 숫자가 1회 이상 발생 
-        chars     / [A-Za-z]                           / 임의 문자 
-        blank     / " "                                / 1개의 블랭크 스페이스 
-        word      / (chars)+                           / chars가 1회 이상 발생 
-        variable  / (chars)+(number)*(chars)*( number)* 
-
-
-    * Lex의 변수
-
-        yyin     / FILE* 유형과 관련이 있으며, lexer가 구문 해석 중인 현재 파일을 가리킨다.  
-        yyout    / FILE* 유형과 관련 있으며, lexer의 출력이 작성될 위치를 가리킨다. 
-                   기본값으로, yyin과 yyout는 표준 입출력.
-        yytext   / 일치 패턴의 텍스트가 이 변수에 저장된다.(char*) 
-        yyleng   / 일치 패턴의 길이를 제공한다. 
-        yylineno / 현재 행 숫자의 정보를 제공한다. (lexer가 지원할 수도 있고 안 할 수도 있다.) 
-
-
-    * Lex의 함수
-
-        yylex()       / 분석 시작하는 함수. Lex가 자동으로 생성.  
-        yywrap()      / 이 함수는 파일( 혹은 입력)의 끝에 호출된다. 이 기능이 1을 반환하면 파싱은 정지한다. 따라서 이 함수는 다중 
-                파일의 파싱에 사용될 수 있다. 코드는 세번째 섹션에서 작성되어 다중 파일이 파싱된다. 말하자면 모든 파일이
-                파싱될 때까지 yyin 파일 포인터가 상이한 파일을 가리킨다는 전략이다. 마지막에 yywrap()가 구문 해석의 종료
-                를 가리키기 위하여 1을 반환한다. 
-        yyless(int n) / 이 함수는 판독 토큰의 'n' 문자를 제외한 모든 것을 밀어낸다. 
-        yyless(int n) / 이 함수는 판독 토큰의 'n' 문자를 제외한 모든 것을 밀어낸다. 
-        yymore()      / 이 함수는 Lexer에게 현재의 토큰에 다음 토큰을 부가하도록 지시한다.
-*/
