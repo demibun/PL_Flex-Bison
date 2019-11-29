@@ -10,13 +10,9 @@
 Integer [0-9]+
 ID [a-zA-Z](([a-zA-Z])|([0-9]))*
 Float [-+]?[0-9]*\.[0-9]+
-/* WHITESPACE 부분 추가 요망 */
+Whitespace [ \t]+
 
 %%
-
-{Integer} {return Integer;}
-{ID} {return ID;}
-{Float} {return Float;}
 
 "mainprog" {return k_mainprog;}
 "function"  {return k_function;}
@@ -32,6 +28,8 @@ Float [-+]?[0-9]*\.[0-9]+
 "return" {return k_return;}
 "print" {return k_print;}
 "in" {return k_in;}
+"int" {return int_prim;}
+"float" {return float_prim;}
 
 "+" {return o_plus;}
 "-" {return o_minus;}
@@ -54,5 +52,10 @@ Float [-+]?[0-9]*\.[0-9]+
 "[" {return d_open_square_bracket;}
 "]" {return d_close_square_bracket;}
 ":" {return d_colon;}
+
+{Integer} {return Integer;}
+{ID} {return ID;}
+{Float} {return Float;}
+{Whitespace} {return Whitespace;}
 
 %%

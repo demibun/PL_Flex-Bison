@@ -4,6 +4,8 @@
     
     int yylex();
     void yyerror(char* s);
+
+    FILE *yyin, *yyout;
 %}
 
 %token Integer 
@@ -51,10 +53,14 @@
 
 %% 
 
-program: k_mainprog ID d_semicolon declatarions subprogram_declarations compound_statement;
+program: k_mainprog ID d_semicolon declatarions subprogram_declarations compound_statement { fprintf(yyout, "program started"); }
+        | test;
+
+test: int_prim Whitespace ID Whitespace d_semicolon {fprintf(yyout, "int declaration");}
+    ;
 
 declatarions: type identifier_list d_semicolon declatarions
-            | 
+            | /* epsilon */
             ;
 
 identifier_list: ID 
@@ -68,7 +74,7 @@ type: standard_type
 standard_type: int_prim | float_prim;
 
 subprogram_declarations: subprogram_declaration subprogram_declarations
-                        | 
+                        | /* epsilon */
                         ;
                         
 subprogram_declaration: subprogram_head declatarions compound_statement;
@@ -78,7 +84,7 @@ subprogram_head: k_function ID arguments d_colon standard_type d_semicolon
                 ;
 
 arguments: d_open_bracket parameter_list d_close_bracket
-        | 
+        | /* epsilon */
         ;
 
 parameter_list: identifier_list d_colon type 
@@ -118,7 +124,7 @@ if_statement: ;
 while_statement: ;
 
 actual_parameter_expression:
-                            |
+                            | /* epsilon */
                             expression_list
                             ;
 
@@ -154,11 +160,20 @@ addop: o_plus | o_minus;
 
 multop: o_mul | o_div;
 
+
 %%
 
 int main(int argc, char **argv) {
-    yyparse();
-    return 0;
+
+    yyout = fopen("result.txt", "w+");
+    if (argc > 1) {
+        yyin = fopen(argv[1], "r+");
+        if(!yyin) {
+            fprintf(stderr, "could not open %s", argv[1]);
+            exit(1);
+        }
+        yyparse();
+    }
 }
 
 void yyerror(char* s) {
