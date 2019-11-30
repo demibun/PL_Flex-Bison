@@ -10,7 +10,6 @@
 Integer [0-9]+
 ID [a-zA-Z](([a-zA-Z])|([0-9]))*
 Float [-+]?[0-9]*\.[0-9]+
-Whitespace [ \t]+
 
 %%
 
@@ -20,6 +19,8 @@ Whitespace [ \t]+
 "begin" {return k_begin;}
 "end" {return k_end;}
 "if" {return k_if;}
+"in" {return k_in;}
+"for" {return k_for;}
 "then" {return k_then;}
 "else" {return k_else;}
 "elif" {return k_elif;}
@@ -27,9 +28,6 @@ Whitespace [ \t]+
 "while" {return k_while;}
 "return" {return k_return;}
 "print" {return k_print;}
-"in" {return k_in;}
-"int" {return int_prim;}
-"float" {return float_prim;}
 
 "+" {return o_plus;}
 "-" {return o_minus;}
@@ -53,9 +51,15 @@ Whitespace [ \t]+
 "]" {return d_close_square_bracket;}
 ":" {return d_colon;}
 
+"int" {return int_prim;}
+"float" {return float_prim;}
+
+" " ;
+[ \t\n] ;
 {Integer} {return Integer;}
 {ID} {return ID;}
 {Float} {return Float;}
-{Whitespace} {return Whitespace;}
+
+
 
 %%

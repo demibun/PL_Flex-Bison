@@ -25,8 +25,9 @@
 %token k_while 
 %token k_return 
 %token k_print 
-%token k_in 
 %token k_elif
+%token k_for
+%token k_in 
 %token o_plus 
 %token o_minus 
 %token o_mul 
@@ -47,24 +48,19 @@
 %token d_open_square_bracket 
 %token d_close_square_bracket 
 %token d_colon
-%token Whitespace
-
-%start program
 
 %% 
 
-program: k_mainprog ID d_semicolon declatarions subprogram_declarations compound_statement { fprintf(yyout, "program started"); }
-        | test;
+program: k_mainprog ID d_semicolon declaration subprogram_declarations compound_statement { fprintf(yyout, "program started\n"); }
+        ;
 
-test: int_prim Whitespace ID Whitespace d_semicolon {fprintf(yyout, "int declaration");}
-    ;
 
-declatarions: type identifier_list d_semicolon declatarions
-            | /* epsilon */
+declaration: type identifier_list d_semicolon declaration {fprintf(yyout, "declaration\n");}
+            | /* epsilon */ 
             ;
 
 identifier_list: ID 
-                | ID d_semicolon identifier_list
+                | ID d_rest identifier_list
                 ;
 
 type: standard_type 
@@ -73,11 +69,11 @@ type: standard_type
 
 standard_type: int_prim | float_prim;
 
-subprogram_declarations: subprogram_declaration subprogram_declarations
+subprogram_declarations: subprogram_declaration subprogram_declarations {fprintf(yyout, "subprogram_declarations\n");}
                         | /* epsilon */
                         ;
                         
-subprogram_declaration: subprogram_head declatarions compound_statement;
+subprogram_declaration: subprogram_head declaration compound_statement;
 
 subprogram_head: k_function ID arguments d_colon standard_type d_semicolon
                 | k_procedeure ID arguments d_semicolon
@@ -96,7 +92,7 @@ compound_statement: k_begin statement_list k_end;
 statement_list: statement 
                 | statement d_semicolon statement_list
                 ; 
-statement: variable o_equal expression
+statement: variable d_substitute expression
         | print_statement
         | procedure_statement
         | compound_statement
@@ -107,29 +103,37 @@ statement: variable o_equal expression
         | k_nop
         ;
 
-print_statement: k_print
-                | k_print d_open_bracket expression d_close_bracket
+print_statement: k_print 
+                | k_print d_open_bracket expression d_close_bracket {fprintf(yyout, "print\n");}
                 ;
 
-variable: ID 
+variable: ID {fprintf(yyout, "variable\n");}
         | ID d_open_square_bracket expression d_close_square_bracket
         ;
 
 procedure_statement: ID d_open_bracket actual_parameter_expression d_close_bracket;
 
-for_statement: ;
+for_statement: k_for expression k_in expression d_colon statement else_statement {fprintf(yyout, "for statement\n");};
 
-if_statement: ;
+if_statement: k_if expression d_colon statement elif_statement else_statement {fprintf(yyout, "if statement\n");};
 
-while_statement: ;
+elif_statement: /* epsilon */  
+              | k_elif expression d_colon statement elif_statement {fprintf(yyout, "elif statement\n");}
+              ;
+
+else_statement: /* epsilon */ {fprintf(yyout, "else statement\n");}
+              | k_else d_colon statement {fprintf(yyout, "else statement\n");}
+              ;
+
+while_statement:  k_while expression d_colon statement else_statement {fprintf(yyout, "while statement\n");};
 
 actual_parameter_expression:
                             | /* epsilon */
                             expression_list
                             ;
 
-expression_list: expression
-                | expression d_semicolon expression_list
+expression_list: expression {fprintf(yyout, "expression\n");}
+                | expression d_rest expression_list
                 ;
     
 expression: simple_expression 
@@ -137,7 +141,7 @@ expression: simple_expression
             ;
 
 simple_expression: term 
-                | term addop simple_expression
+                | term addop simple_expression 
                 ;
 
 term: factor
@@ -154,7 +158,7 @@ factor: Integer
 
 sign: o_plus | o_minus;
 
-relop: o_bigger | o_bigger_equal | o_small | o_small_equal | o_equal | o_not_equal | k_in ;
+relop: o_bigger | o_bigger_equal | o_small | o_small_equal | o_equal | o_not_equal | k_in;
 
 addop: o_plus | o_minus;
 
