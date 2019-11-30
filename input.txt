@@ -1,1 +1,1 @@
-int get(int char) : print(a)
+for a in b : print(a)

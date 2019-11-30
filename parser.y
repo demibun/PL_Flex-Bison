@@ -158,7 +158,14 @@ factor: Integer
 
 sign: o_plus | o_minus;
 
-relop: o_bigger | o_bigger_equal | o_small | o_small_equal | o_equal | o_not_equal | k_in;
+relop: o_bigger 
+     | o_bigger_equal 
+     | o_small 
+     | o_small_equal 
+     | o_equal 
+     | o_not_equal 
+     | k_in
+     ;
 
 addop: o_plus | o_minus;
 
