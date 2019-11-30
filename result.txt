@@ -1,0 +1,5 @@
+variable
+variable
+print
+else statement
+while statement

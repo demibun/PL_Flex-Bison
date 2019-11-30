@@ -1,12 +1,20 @@
 %{ 
     #include <stdio.h>
     #include <stdlib.h>
-    
+
     int yylex();
     void yyerror(char* s);
 
     FILE *yyin, *yyout;
+    extern int yylineno;
+
 %}
+
+%union {
+    int lineNum;    
+}
+
+%locations
 
 %token Integer 
 %token int_prim
@@ -48,6 +56,9 @@
 %token d_open_square_bracket 
 %token d_close_square_bracket 
 %token d_colon
+%token Comment
+
+%start while_statement
 
 %% 
 
@@ -55,15 +66,16 @@ program: k_mainprog ID d_semicolon declaration subprogram_declarations compound_
         ;
 
 
-declaration: type identifier_list d_semicolon declaration {fprintf(yyout, "declaration\n");}
+declaration: type identifier_list d_semicolon declaration
             | /* epsilon */ 
+            | identifier_list type d_semicolon declaration {yyerror("error at line");}
             ;
 
 identifier_list: ID 
                 | ID d_rest identifier_list
                 ;
 
-type: standard_type 
+type: standard_type
     | standard_type d_open_square_bracket Integer d_close_square_bracket
     ;
 
@@ -145,7 +157,7 @@ simple_expression: term
                 ;
 
 term: factor
-    | factor multop term
+    | factor multop term 
     ;
 
 factor: Integer 
@@ -164,7 +176,6 @@ relop: o_bigger
      | o_small_equal 
      | o_equal 
      | o_not_equal 
-     | k_in
      ;
 
 addop: o_plus | o_minus;
@@ -187,6 +198,12 @@ int main(int argc, char **argv) {
     }
 }
 
-void yyerror(char* s) {
-    exit(1);
+int getVarNames(char *name) {
+    
 }
+
+void yyerror(char* s) {
+    fprintf(yyout, "%s: %d", s, yylval.lineNum+1);
+    yyparse();
+}
+

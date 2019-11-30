@@ -1,8 +1,10 @@
 %option noyywrap
+%option yylineno
 
 %{
   
     #include <stdio.h>
+    #include <string.h>
     #include "parser.tab.h"
 
 %}
@@ -55,11 +57,12 @@ Float [-+]?[0-9]*\.[0-9]+
 "float" {return float_prim;}
 
 " " ;
-[ \t\n] ;
+[ \t] ;
+\n {yylval.lineNum++;}
+[\/\/][0-9a-zA-Z]* ;
 {Integer} {return Integer;}
 {ID} {return ID;}
 {Float} {return Float;}
-
 
 
 %%
