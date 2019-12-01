@@ -110,6 +110,7 @@ compound_statement: k_begin statement_list k_end;
 statement_list: statement 
                 | statement d_semicolon statement_list
                 ; 
+                
 statement: variable d_substitute expression
         | print_statement
         | procedure_statement
@@ -132,12 +133,11 @@ variable: ID
 procedure_statement: ID d_open_bracket actual_parameter_expression d_close_bracket;
 
 for_statement: k_for expression k_in expression d_colon statement else_statement 
-             | k_for expression error expression error statement else_statement {yyerrok; yyclearin;}
              ;
 
 if_statement: k_if expression d_colon statement elif_statement else_statement 
             ;
-
+            
 elif_statement: /* epsilon */  
               | k_elif expression d_colon statement elif_statement 
               ;
@@ -147,7 +147,6 @@ else_statement: /* epsilon */
               ;
 
 while_statement:  k_while expression d_colon statement else_statement
-               |  k_while expression error statement else_statement {yyerrok; yyclearin;}
                ;
 
 actual_parameter_expression:

@@ -3,6 +3,7 @@
 
 mainprog test1;	// program start, ID, semicolon
 int[3] a1, a2, a3;	// declaration
+int a;
 function add (a1, a2 : float) : int; // subprogram_declarations, subprogram_head 
 float a1;  // declaration
 
