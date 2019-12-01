@@ -909,7 +909,7 @@ YY_RULE_SETUP
 case 40:
 YY_RULE_SETUP
 #line 61 "parser.l"
-{yylval.lineNum++;}
+;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP

@@ -58,7 +58,7 @@ Float [-+]?[0-9]*\.[0-9]+
 
 " " ;
 [ \t] ;
-\n {yylval.lineNum++;}
+\n ;
 [\/\/][0-9a-zA-Z]* ;
 {Integer} {return Integer;}
 {ID} {return ID;}

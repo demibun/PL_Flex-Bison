@@ -6,13 +6,10 @@
     void yyerror(char* s);
 
     FILE *yyin, *yyout;
+
     extern int yylineno;
 
 %}
-
-%union {
-    int lineNum;    
-}
 
 %locations
 
@@ -58,7 +55,7 @@
 %token d_colon
 %token Comment
 
-%start while_statement
+%start declaration
 
 %% 
 
@@ -66,9 +63,10 @@ program: k_mainprog ID d_semicolon declaration subprogram_declarations compound_
         ;
 
 
-declaration: type identifier_list d_semicolon declaration
+declaration: 
+            |type identifier_list d_semicolon declaration {fprintf(yyout, "declaration successful\n");}
+            | type identifier_list declaration {yyerrok;  yyclearin; fprintf(yyout, "';' is missing : %d\n", yylineno);}
             | /* epsilon */ 
-            | identifier_list type d_semicolon declaration {yyerror("error at line");}
             ;
 
 identifier_list: ID 
@@ -194,16 +192,11 @@ int main(int argc, char **argv) {
             fprintf(stderr, "could not open %s", argv[1]);
             exit(1);
         }
-        yyparse();
+        return yyparse();
     }
 }
 
-int getVarNames(char *name) {
-    
-}
-
 void yyerror(char* s) {
-    fprintf(yyout, "%s: %d", s, yylval.lineNum+1);
-    yyparse();
-}
+    fprintf(yyout, "%s: %d\n", s, yylineno);
+}  
 
