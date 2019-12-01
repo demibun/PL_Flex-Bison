@@ -4,7 +4,7 @@
 mainprog test1;	// program start, ID, semicolon
 int[3] a1, a2, a3;	// declaration
 function add (a1, a2 : float) : int; // subprogram_declarations, subprogram_head 
-float a1, a2;  // declaration
+float a1;  // declaration
 
 begin	 // compund_statement 
 while a1 < 3 : print(num);	// while_statement
@@ -18,7 +18,7 @@ begin
 while a2 >= 3 : print(num)	//while-else
 else : a = 3;
 for a in count :  print(1);
-if a >= 3: print(1)
+if a >= 3 ! print(1)
 elif a < 3: print(2)
 else : print(3);
 
