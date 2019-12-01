@@ -59,9 +59,10 @@ Float [-+]?[0-9]*\.[0-9]+
 " " ;
 [ \t] ;
 \n ;
-[\/\/][0-9a-zA-Z]* ;
+"//".* ;
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] ;
 {Integer} {return Integer;}
-{ID} {return ID;}
+{ID} {sscanf(yytext, "%s", yylval.str); return ID;}
 {Float} {return Float;}
 
 

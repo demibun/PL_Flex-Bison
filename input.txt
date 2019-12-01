@@ -2,5 +2,3 @@ a int;
 int b;
 c int;
 int d;
-e int;
-int f;

@@ -78,15 +78,28 @@
      d_close_bracket = 294,
      d_open_square_bracket = 295,
      d_close_square_bracket = 296,
-     d_colon = 297,
-     Comment = 298
+     d_colon = 297
    };
 #endif
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE
+{
+
+/* Line 1676 of yacc.c  */
+#line 16 "parser.y"
+
+    char str[100];
+    int int_val;
+    float float_val;
+
+
+
+/* Line 1676 of yacc.c  */
+#line 102 "parser.tab.h"
+} YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

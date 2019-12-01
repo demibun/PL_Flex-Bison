@@ -9,10 +9,15 @@
     FILE *yyin, *yyout;
 
     extern int yylineno;
-
-    char error_Massage[100];
+    
 
 %}
+
+%union {
+    char str[100];
+    int int_val;
+    float float_val;
+}
 
 %locations
 
@@ -56,7 +61,8 @@
 %token d_open_square_bracket 
 %token d_close_square_bracket 
 %token d_colon
-%token Comment
+
+%type <str> ID;
 
 %start declaration
 
@@ -66,9 +72,8 @@ program: k_mainprog ID d_semicolon declaration subprogram_declarations compound_
         ;
 
 
-declaration: 
-            |type identifier_list d_semicolon declaration
-            | error d_semicolon declaration {yyerrok; strcpy(error_Massage, $3);}
+declaration: type identifier_list d_semicolon declaration
+            | error d_semicolon declaration {yyerrok; yyclearin;}
             | /* epsilon */ 
             ;
 
@@ -117,16 +122,18 @@ statement: variable d_substitute expression
         ;
 
 print_statement: k_print 
-                | k_print d_open_bracket expression d_close_bracket {fprintf(yyout, "print\n");}
+                | k_print d_open_bracket expression d_close_bracket 
                 ;
 
-variable: ID {fprintf(yyout, "variable\n");}
+variable: ID 
         | ID d_open_square_bracket expression d_close_square_bracket
         ;
 
 procedure_statement: ID d_open_bracket actual_parameter_expression d_close_bracket;
 
-for_statement: k_for expression k_in expression d_colon statement else_statement {fprintf(yyout, "for statement\n");};
+for_statement: k_for expression k_in expression d_colon statement else_statement {fprintf(yyout, "for statement\n");}
+             | k_for expression error expression d_colon statement else_statement {yyerrok; yyclearin;}
+             ;
 
 if_statement: k_if expression d_colon statement elif_statement else_statement {fprintf(yyout, "if statement\n");};
 
@@ -134,7 +141,7 @@ elif_statement: /* epsilon */
               | k_elif expression d_colon statement elif_statement {fprintf(yyout, "elif statement\n");}
               ;
 
-else_statement: /* epsilon */ {fprintf(yyout, "else statement\n");}
+else_statement: /* epsilon */ 
               | k_else d_colon statement {fprintf(yyout, "else statement\n");}
               ;
 
@@ -158,7 +165,7 @@ simple_expression: term
                 ;
 
 term: factor
-    | factor multop term 
+    | factor multop term
     ;
 
 factor: Integer 
@@ -187,7 +194,6 @@ multop: o_mul | o_div;
 %%
 
 int main(int argc, char **argv) {
-    strcpy (error_Massage, "test");
     yyout = fopen("result.txt", "w+");
     if (argc > 1) {
         yyin = fopen(argv[1], "r+");
@@ -200,6 +206,6 @@ int main(int argc, char **argv) {
 }
 
 void yyerror(char* s) {
-    fprintf(yyout, "%s : %s at line %d\n", s, error_Massage, yylineno);
+    fprintf(yyout, "%s : at line %d ( %s )\n", s, yylineno, yylval.str);
 }  
 
