@@ -64,11 +64,11 @@
 
 %type <str> ID;
 
-%start declaration
+%start program
 
 %% 
 
-program: k_mainprog ID d_semicolon declaration subprogram_declarations compound_statement { fprintf(yyout, "program started\n"); }
+program: k_mainprog ID d_semicolon declaration subprogram_declarations compound_statement { fprintf(yyout, "No error :) \n"); }
         ;
 
 
@@ -87,7 +87,7 @@ type: standard_type
 
 standard_type: int_prim | float_prim;
 
-subprogram_declarations: subprogram_declaration subprogram_declarations {fprintf(yyout, "subprogram_declarations\n");}
+subprogram_declarations: subprogram_declaration subprogram_declarations
                         | /* epsilon */
                         ;
                         
@@ -131,28 +131,28 @@ variable: ID
 
 procedure_statement: ID d_open_bracket actual_parameter_expression d_close_bracket;
 
-for_statement: k_for expression k_in expression d_colon statement else_statement {fprintf(yyout, "for statement\n");}
-             | k_for expression error expression d_colon statement else_statement {yyerrok; yyclearin;}
+for_statement: k_for expression k_in expression d_colon statement else_statement 
+             | k_for expression error expression error statement else_statement {yyerrok; yyclearin;}
              ;
 
-if_statement: k_if expression d_colon statement elif_statement else_statement {fprintf(yyout, "if statement\n");};
+if_statement: k_if expression d_colon statement elif_statement else_statement;
 
 elif_statement: /* epsilon */  
-              | k_elif expression d_colon statement elif_statement {fprintf(yyout, "elif statement\n");}
+              | k_elif expression d_colon statement elif_statement 
               ;
 
 else_statement: /* epsilon */ 
-              | k_else d_colon statement {fprintf(yyout, "else statement\n");}
+              | k_else d_colon statement 
               ;
 
-while_statement:  k_while expression d_colon statement else_statement {fprintf(yyout, "while statement\n");};
+while_statement:  k_while expression d_colon statement else_statement;
 
 actual_parameter_expression:
                             | /* epsilon */
                             expression_list
                             ;
 
-expression_list: expression {fprintf(yyout, "expression\n");}
+expression_list: expression
                 | expression d_rest expression_list
                 ;
     

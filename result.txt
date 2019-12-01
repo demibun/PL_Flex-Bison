@@ -1,2 +1,1 @@
-syntax error : at line 1 ( a )
-syntax error : at line 3 ( c )
+No error :) 

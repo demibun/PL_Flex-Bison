@@ -1,4 +1,30 @@
-a int;
-int b;
-c int;
-int d;
+/* comment
+ test */
+
+mainprog test1;	// program start, ID, semicolon
+int[3] a1, a2, a3;	// declaration
+function add (a1, a2 : float) : int; // subprogram_declarations, subprogram_head 
+float a1, a2;  // declaration
+
+begin	 // compund_statement 
+while a1 < 3 : print(num);	// while_statement
+for a in a1 :  print(1);	// for_statement
+if a >= 3: print(1)		// if_statement
+elif a < 3: print(2)		// elif_statement
+else : print(3)		// else_statement
+end
+
+begin 
+while a2 >= 3 : print(num)	//while-else
+else : a = 3;
+for a in count :  print(1);
+if a >= 3: print(1)
+elif a < 3: print(2)
+else : print(3);
+
+test2(a2 + a1, a3 != a4);	// procedure_statement
+return a/3		// return_statement
+
+end
+
+// comment test
