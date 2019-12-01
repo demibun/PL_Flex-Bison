@@ -1,3 +1,6 @@
-int a;
-int b
-int c;
+a int;
+int b;
+c int;
+int d;
+e int;
+int f;

@@ -1,6 +1,7 @@
 %{ 
     #include <stdio.h>
     #include <stdlib.h>
+    #include <string.h>
 
     int yylex();
     void yyerror(char* s);
@@ -8,6 +9,8 @@
     FILE *yyin, *yyout;
 
     extern int yylineno;
+
+    char error_Massage[100];
 
 %}
 
@@ -64,8 +67,8 @@ program: k_mainprog ID d_semicolon declaration subprogram_declarations compound_
 
 
 declaration: 
-            |type identifier_list d_semicolon declaration {fprintf(yyout, "declaration successful\n");}
-            | type identifier_list declaration {yyerrok;  yyclearin; fprintf(yyout, "';' is missing : %d\n", yylineno);}
+            |type identifier_list d_semicolon declaration
+            | error d_semicolon declaration {yyerrok; strcpy(error_Massage, $3);}
             | /* epsilon */ 
             ;
 
@@ -184,7 +187,7 @@ multop: o_mul | o_div;
 %%
 
 int main(int argc, char **argv) {
-
+    strcpy (error_Massage, "test");
     yyout = fopen("result.txt", "w+");
     if (argc > 1) {
         yyin = fopen(argv[1], "r+");
@@ -192,11 +195,11 @@ int main(int argc, char **argv) {
             fprintf(stderr, "could not open %s", argv[1]);
             exit(1);
         }
-        return yyparse();
+        return yyparse();   
     }
 }
 
 void yyerror(char* s) {
-    fprintf(yyout, "%s: %d\n", s, yylineno);
+    fprintf(yyout, "%s : %s at line %d\n", s, error_Massage, yylineno);
 }  
 

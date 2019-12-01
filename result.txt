@@ -1,1 +1,3 @@
-syntax error: 3
+syntax error : test at line 1
+syntax error : test at line 3
+syntax error : test at line 5
